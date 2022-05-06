@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Seximal Calculator</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="css/style.css">
+    <script type="text/javascript" src="js/script.js"></script>
+    <!-- <script type="text/javascript" src="js/brython.js"></script>
+    <script type="text/javascript" src="js/brython_stdlib.js"></script>
+    <script type="text/javascript" src="python/calculadora.brython.js"></script> -->
+    <link rel="icon" type="image/png" href="images/SeximalLogo.png">
+</head>
+<body>
+<!-- Navbar -->
+<div class="navBar">
+    <ul>
+  
+        <li><a href="#calculatorSpace">Seximal Calculator</a></li>
+        <li><a href="#">Other Bases Calculator</a></li>
+        <li><a href="#WhySeximal">Why seximal?</a></li>
+        <li><a href="#WhyLogo">Why that logo?</a></li>
+        <li style="float:right"><a class="active" href="#Conversor">Seximal/Decimal Conversor</a></li>
+    </ul>
+</div>
+<div id="Title" style="margin:0 auto; padding: 20px;">
+    <h1 id="title">Seximal Calculator</h1>
+</div>
+
+<div id="calculatorSpace" style="margin-top:20px; margin-bottom:10px; padding: 20px;">
+  <table class="calculator">
+      <tr>
+         <td colspan="4"><label id="processLabel" style="padding: 10px;"> </label></td>
+      </tr>   
+      <tr>
+         <td colspan="4"><input type="text" id="result" readonly="readonly" placeholder="Calculations"/></td>
+
+      </tr>
+      <tr>
+         <td><input class="calcButton" type="button" value='<-' onclick="remove()"/> </td>
+         <td><input class="calcButton" type="button" value="+/-" onclick="change_sign()"/> </td>
+         <td><input class="calcButton" type="button" value="^" onclick="oper('^')"/> </td>
+         <td><input class="calcButton" type="button" value="AC" onclick="clr()"/> </td>
+      </tr>
+      <tr>
+         <td><input class="calcButton" type="button" value="0" onclick="dis('0')"/> </td>
+         <td><input class="calcButton" type="button" value="1" onclick="dis('1')"/> </td>
+         <td><input class="calcButton" type="button" value="+" onclick="oper('+')"/> </td>
+         <td><input class="calcButton" type="button" value="-" onclick="oper('-')"/> </td>
+      </tr>
+      <tr>
+         <td><input class="calcButton" type="button" value="2" onclick="dis('2')"/> </td>
+         <td><input class="calcButton" type="button" value="3" onclick="dis('3')"/> </td>
+         <td><input class="calcButton" type="button" value="*" onclick="oper('*')"/> </td>
+         <td><input class="calcButton" type="button" value="/" onclick="oper('/')"/> </td>
+      </tr>
+      <tr>
+         <td><input class="calcButton" type="button" value="4" onclick="dis('4')"/> </td>
+         <td><input class="calcButton" type="button" value="5" onclick="dis('5')"/> </td>
+         <td><input class="calcButton" type="button" value="." onclick="dis('.')"/> </td>
+         <td><input class="calcButton" type="button" value="=" id="equal" onclick="solve()"/> </td>
+      </tr>
+ </table>
+</div>
+<div id="Conversor" style="margin-top:10px; padding: 20px; width: 800px; margin:0 auto;">
+   <h2>Seximal/Decimal Conversor</h2>
+   <br>
+   <table id="conversor">
+      <!--TODO: mas bonito xd-->
+      <tr>
+         <td><input type="text" class="inputText" placeholder="Decimal" id="decimal"/></td>
+         <td><input class="calcButton" style="width:100%; height:100%; padding: 20px; margin: auto; background-color: rgb(23, 4, 53);" type="button" value="Convert" onclick="convert('seximal')"/></td>
+      </tr>
+         <td><input type="text" class="inputText" placeholder="Seximal" id="seximal"/></td>
+         <td><input class="calcButton" style="width:100%; height:100%; padding: 20px; margin: auto; background-color: rgb(23, 4, 53);" type="button" value="Convert" onclick="convert('decimal')"/></td>
+   
+   
+   
+   </table>
+
+ </div>
+<div id="WhySeximal" style="margin-top:60px; padding: 20px; width: 1000px; margin:0 auto;">
+  <h2>Why Seximal?</h2>
+  <br>
+  <p>
+    Decimal is the base we use for everything in our daily lives, it uses ten different numbers to represent all numbers, but why ten?
+    The number ten was imposed probably because we have ten finguers, but that doesn't mean that ten is the best base to count. I was inspired by <a href="https://www.seximal.net" target="_blank">this page</a> that explains in more detail why seximal is better base than base-10 (decimal).
+    Just to be clear, I don't have any relation to the owner of that page, but I was inspired to make a calculator that would work with base-6 completely. Seximal has it's advantages, like having 0.2 be 1/3 instead of 0.3333, but for all the information on seximal, again go to: <a href="https://seximal.net">seximal.net</a>
+    Another reason for making this page was making a base-10 to base-6 conversor that would work with decimals, there are lots of base conversors online, but I haven't found one that is compatilbe with decimals, so I made one. In the future I would like to add other bases calculators and conversors to make this page more "useful".
+  </p>
+</div>
+
+ <br>
+ <hr>
+ <div class="footer">
+    <a>hallo</a>
+ </div>
+  
+
+</body>
+</html>
