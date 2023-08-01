@@ -2,6 +2,7 @@
 class Operate:
     def __init__(self): 
         self.base = 6
+        self.max_decimals = 10
 
     def decimal_manager_to_seximal(self, num): # converts a decimal number to its equivalent in the "seximal" number system (base 6), handling both the integer and decimal parts.
         # Manage symbol
@@ -13,31 +14,23 @@ class Operate:
         
         # manage floating point numbers
         if type(num) == float:
-            decimal_numbers = []
             decimal_numbers = str(num).split(".") # split units and decimals
             units = int(decimal_numbers[0])
+            units = self.conversor_to_seximal(units)
 
-            # to convert decimals we multiply them by 6^n n been the number of decimals to convert it to a "int" seximal value in base 10, we convert the whole part into seximal and for the decimals we repeat the proceess
-            processing_seximal = round(float(f".{decimal_numbers[1]}")*self.base**len(str(decimal_numbers[1])), 4)
-            # we do a first iteration and if it's not a whole number we loop 
-            if float(processing_seximal).is_integer():
-                whole_decimals = str(self.conversor_to_seximal(int(processing_seximal)))
-            else:
-                whole_decimals = ""
+            processing_seximal = decimal_numbers[1]
+            whole_decimals = ""
+            while len(whole_decimals) < self.max_decimals: # maximum 10 decimal places to round later --> rounding in seximal was too hard... TODO
+                processing_seximal = round(float(f".{processing_seximal}")*self.base, self.max_decimals) # multiply by the base and take the whole part, then take the decimals and repeat
+                whole, processing_seximal = str(processing_seximal).split(".")
+                whole_decimals = whole_decimals + str(whole)
+                print(whole_decimals, whole, processing_seximal)
 
-            while not float(processing_seximal).is_integer(): # maximum 8 decimal places to round later --> rounding in seximal was too hard... TODO
-                whole, part = str(processing_seximal).split(".")
-
-                if int(whole) < self.base:   # if in seximal the number is one digit long we add a 0
-                    whole_decimals = whole_decimals + "0"
-                whole_decimals = whole_decimals + str(self.conversor_to_seximal(int(whole)))
-                processing_seximal = round(float(f".{part}")*self.base**len(str(part)), 4) # the whole part will be converted to seximal and the other will be passed again
-                # print(whole_decimals, whole, part)
-                if len(whole_decimals) >= 8:
+                if processing_seximal == "0":
                     break
 
             seximals = whole_decimals
-            units = self.conversor_to_seximal(units)
+            
             num = float(f"{units}.{seximals}")
 
         else: # if there's no decimals
@@ -55,15 +48,12 @@ class Operate:
 
         if type(num) == float:
             seximal_numbers = str(num).split(".")
-            units = int(seximal_numbers[0])
-            digits = len(str(seximal_numbers[1]))
-            seximal_numbers[1] = self.conversor_to_decimal(seximal_numbers[1])
-            decimals = round(seximal_numbers[1]/6**digits, 8) # ROUNDS TO 8 DECIMAL PLACES 
-            # TODO: LOOP --> Update: without the loop it seems to work really well
-            units = self.conversor_to_decimal(units)
+            units = self.conversor_to_decimal(int(seximal_numbers[0]))
+            decimals = self.conversor_to_decimal(seximal_numbers[1], True) # really important that our input num is a str, so it keeps the 0 to the left
             num = units + decimals
         else:
             num = self.conversor_to_decimal(num)
+
         if neg:
             num *= -1
         return num
@@ -78,13 +68,21 @@ class Operate:
             num = temp_number
         return num
 
-    def conversor_to_decimal(self, num): #:)
+    def conversor_to_decimal(self, num, decimals=False): # iterates differently depending if its whole number or decimals
         list_seximal = [int(a) for a in str(num)]
-        list_seximal.reverse()
         result = 0
-        for i, number in enumerate(list_seximal):
-            result += number * (self.base**i)        
+        if decimals:
+            for i, number in enumerate(list_seximal): # really important that our input num is a str, so it keeps the 0 to the left
+                result += number * (1/(self.base**(i+1)))     
+        else:
+            list_seximal.reverse()
+            for i, number in enumerate(list_seximal):
+                result += number * ((self.base**i))  
+
         return result
+    
+
+    # TODO: make calculator better lmao
 
     def operator(self, num1, num2, sign): #:)
         if sign == self.operations[0]:
@@ -104,6 +102,8 @@ class Operate:
             result = None
         return result
     
+
+    # TODO: figure out wtf is this
     def action(self, num1, num2, sign):
         self.number1 = num1
         self.number2 = num2
@@ -160,12 +160,33 @@ class Operate:
 
 
 if __name__ == "__main__":
-    number1 = 13.13205432
+    number1 = 13
     op = Operate()
     result = op.seximal_manager_to_decimal(number1)
     if type(result) == int or type(result) == float:
-        print("Result seximal:", result)
+        print("Result decimal:", result)
     else:
         print("Error number not in seximal or sign not detected\n")
 
+
+
+"""
+Clarification on decimal changing of base
+
+I was trying to multiplying the decimals by 6 to the power of n, n been the number of decimal places. Then I took the whole part of the result and transformed it to seximal using the conversor I used on whole numbers, and then I repeated the process with the next decimals. This completely worked, but when the numbers in seximal had to start by 0.0xx it failed to put the 0 in.
+I finally found out that this would have worked if I used the "n" to check how many numbers there should be at the end, and if it was less i should've added 0 to the left.
+
+This all worked, but there's an easier solution.
+If I take a decimal value, like 0.25; and I multiply it by 6:
+0.25 * 6 = 1.5
+The whole part is the first digit of the "seximals", then I repeat this process with the decimals of the new number.
+
+0.5 * 6 = 3.
+So the seximal value is 0.13
+base 6 (0.13) = base 10 (0.25)
+
+this works with every base, I think xd
+
+
+"""
 
