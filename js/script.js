@@ -2,30 +2,39 @@
 class Operate{
     constructor(){
         this.base = 6;
+        this.max_decimals = 10;
     }
-    conversor_to_decimal(num){
+    conversor_to_decimal(num, decimals=false){ // convert whole number in base 6 to decimal
         var digits = num.toString().split('');
-        var arrayS = digits.map(Number);
-        arrayS = arrayS.reverse();
+        var arrayS = digits.map(Number); //converts the numbers from str to int
         let result = 0;
-        for (let i = 0; i < arrayS.length; i++) {
-            result += arrayS[i] * (6**i);
+        if (decimals){
+            for (let i = 0; i < arrayS.length; i++) { // iterate through all decimals and multiply it by 1/6^n
+                result += arrayS[i] * (1/(this.base**(i+1)))
+            }
+        } else{
+            arrayS = arrayS.reverse();
+            for (let i = 0; i < arrayS.length; i++) { // iterate through all whole numbers, inversly,  and multiply it by 6^n
+                result += arrayS[i] * (this.base**i)
+            }
         }
+        
         return result;
     }
-    conversor_to_seximal(num){
+    conversor_to_seximal(num){ // convert whole number in base 10 to seximal
         let temp_number = "";
-        if (num >= 6){
-            while (num >= 6){
-                temp_number = (`${num%6}${temp_number}`);
-                num = (num / 6) >> 0;
+        if (num >= this.base){
+            while (num >= this.base){
+                temp_number = (`${num%this.base}${temp_number}`);
+                num = (num / this.base) >> 0; // the bit operator just makes the result an int
             }
             num = parseInt(`${num}${temp_number}`);
         }
         return num;
     }
-    seximal_manager_to_decimal(num){
+    seximal_manager_to_decimal(num){ // convert from base 6 to base 10, distinguishing between whole numbers and decimals
         var neg;
+        let result;
         if (num < 0){
             num = Math.abs(num);
             neg = true;
@@ -33,82 +42,59 @@ class Operate{
         else {
             neg = false;
         }
-        let num_float = parseFloat(num);
-        if (Number.isInteger(num_float)){
-            var units = num;
-        }
-        else {
-            var seximal_numbers = num.toString().split('.');
-            var units = parseInt(seximal_numbers[0]);
-            let digits = seximal_numbers[1].toString().length;
-            seximal_numbers[1] = this.conversor_to_decimal(seximal_numbers[1]);
-            var decimals = Math.round((seximal_numbers[1]/6**digits)*1000000)/1000000;
-        }
-        units = this.conversor_to_decimal(units)
-        if (typeof decimals == 'undefined') {
-            num = units;
-        }
-        else{
-            num = units + decimals;
+        if (num % 1 != 0){
+            let seximal_numbers = num.toString().split('.');
+            console.log(seximal_numbers);
+            let units = this.conversor_to_decimal(parseInt(seximal_numbers[0]));
+            let decimals = this.conversor_to_decimal(seximal_numbers[1], true); // we pass it a string so the 0's to the left stay
+            result = units + decimals;
+            result = Math.round(result*(10**this.max_decimals))/(10**this.max_decimals);
+        } else {
+            result = this.conversor_to_decimal(num);
         }
         if (neg == true) {
-            num *= -1;            
+            result *= -1;            
         }
-        return num;
+        return result;
     }
-    decimal_manager_to_seximal(num){
+    decimal_manager_to_seximal(num){ // function to manage the decimals and digits to convert them to seximal
         var neg;
+        let result = num;
         if (num < 0){
             num = Math.abs(num);
             neg = true;
-        } 
-        else {
+        } else {
             neg = false;
-        }
-        let num_float = parseFloat(num);
-        if (Number.isInteger(num_float)){
-            num = parseInt(num);
-            var units = num;
-
-        }
-        else {
-            var decimal_numbers = num.toString().split('.');
-            var units = parseInt(decimal_numbers[0]);
-            if (decimal_numbers[0] == undefined || decimal_numbers[1] == undefined){
-                return undefined;
-            }
-            let digits = decimal_numbers[1].toString().length;
-            var decimals = Math.round(parseFloat((`.${decimal_numbers[1]}`)*6**digits)*1000)/1000;
-            console.log(decimals + " decimals");
-            if (!Number.isInteger(decimals)){
-                let decimal_decimals_array = num.toString().split('.');
-                console.log(decimal_decimals_array + " decimals array");
-                let decimal_decimals = decimal_decimals_array[1];
-                digits += decimal_decimals.toString().length;
-                decimals = decimal_decimals;
-                console.log(decimals + " decimals " + digits);
-            }
-            while (decimals.toString().slice(-1) == "0"){
-                decimals = decimals.toString().slice(0, -1);
-                console.log(decimals)
-            }
-            console.log(decimals)
-            decimals = parseInt(decimals);
-            decimals = this.conversor_to_seximal(decimals);
-            decimals = parseFloat(`.${decimals}`);
         }
         
-        units = this.conversor_to_seximal(units);
-        if (typeof decimals == 'undefined') {
-            num = units;
+        //manage floating point numbers
+        if (num % 1 != 0){ //if the number has decimals (x.0 doesn't count)´
+            let decimal_numbers = num.toString().split('.');
+            let units = parseInt(decimal_numbers[0]);
+            units = this.conversor_to_seximal(units);
+
+            let processing_seximal = decimal_numbers[1];
+            let whole_decimals = "";
+            while (whole_decimals.length < this.max_decimals) { // we loop until we have 10 decimals
+                processing_seximal = Math.round(parseFloat((`.${processing_seximal}`)*this.base)*(10**this.max_decimals))/(10**this.max_decimals);
+                let processing_list = processing_seximal.toString().split('.'); // processing_list[0] is the whole number and processing_list[1] is the decimals
+                whole_decimals = whole_decimals + processing_list[0];
+                processing_seximal = processing_list[1];
+
+                if (processing_seximal == "0"){
+                    break;
+                }                
+            }
+            result = parseFloat(`${units}.${whole_decimals}`);
+
+        } else{ //if there's no decimals
+            result = this.conversor_to_seximal(num);
         }
-        else{
-            num = units + decimals;
-        }
+
         if (neg == true) {
-            num *= -1;            
+            result *= -1;            
         }
-        return num;
+        return result;
     }
     is_int(num){
         if (Number.isInteger(num)){
@@ -167,7 +153,7 @@ class Operate{
         try {
             var result_decimal = this.operator(num1_decimal, num2_decimal, sign);
             if (typeof result_decimal == "string"){
-                return "mE"
+                return "mE";
             }
         } catch (e){
             return undefined;
@@ -273,25 +259,15 @@ function convert(to){
     }
 }
 
-prueba = op.decimal_manager_to_seximal(0.1);
-console.log(prueba);
+let value = 10
+prueba = op.conversor_to_decimal(value);
+// console.log(value);
+// console.log(prueba);
+
+//TODO: Fix calculator function and add sqrt
 
 
-// else {
-//     var decimal_numbers = num.toString().split('.');
-//     var units = parseInt(decimal_numbers[0]);
-//     if (decimal_numbers[0] == undefined || decimal_numbers[1] == undefined){
-//         return undefined;
-//     }
-//     let digits = decimal_numbers[1].toString().length;
-//     var decimals = Math.round(parseFloat((`.${decimal_numbers[1]}`)*6**digits));
-//     while (decimals.toString().slice(-1) == "0"){
-//         decimals = decimals.toString().slice(0, -1);
-//     }
-//     decimals = parseInt(decimals);
-//     decimals = this.conversor_to_seximal(decimals);
-//     decimals = parseFloat(`.${decimals}`);
-// }
+
 
 
 

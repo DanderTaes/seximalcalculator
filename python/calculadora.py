@@ -24,20 +24,19 @@ class Operate:
                 processing_seximal = round(float(f".{processing_seximal}")*self.base, self.max_decimals) # multiply by the base and take the whole part, then take the decimals and repeat
                 whole, processing_seximal = str(processing_seximal).split(".")
                 whole_decimals = whole_decimals + str(whole)
-                print(whole_decimals, whole, processing_seximal)
 
                 if processing_seximal == "0":
                     break
 
             seximals = whole_decimals
             
-            num = float(f"{units}.{seximals}")
+            result = float(f"{units}.{seximals}")
 
         else: # if there's no decimals
-            num = self.conversor_to_seximal(num)
+            result = self.conversor_to_seximal(num)
         if neg:
-            num *= -1
-        return num
+            result *= -1
+        return result
 
     def seximal_manager_to_decimal(self, num): # converts a number in the "seximal" number system (base 6) to its decimal equivalent, handling both the integer and decimal parts.
         if num < 0: # manage symbol
@@ -51,6 +50,7 @@ class Operate:
             units = self.conversor_to_decimal(int(seximal_numbers[0]))
             decimals = self.conversor_to_decimal(seximal_numbers[1], True) # really important that our input num is a str, so it keeps the 0 to the left
             num = units + decimals
+            num = round(num, self.max_decimals)
         else:
             num = self.conversor_to_decimal(num)
 
@@ -77,7 +77,7 @@ class Operate:
         else:
             list_seximal.reverse()
             for i, number in enumerate(list_seximal):
-                result += number * ((self.base**i))  
+                result += number * (self.base**i)
 
         return result
     
